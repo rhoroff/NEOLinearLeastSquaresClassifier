@@ -2,8 +2,6 @@ import numpy as np
 import numpy.linalg as la
 import csv, sys, os, re
 
-
-
 def classification_to_vector(classification):
     if classification == '1':
         return [1,0,0]
@@ -34,14 +32,12 @@ def parse_database_into_matrix(inputFile):
 
             for row in datareader:
                 data_point = []
+                class_col = len(row)-1
+                classification = row[class_col]
 
+                # 'Iris-setosa' -> [1,0,0], 'Iris-virginica' -> [0,1,0], 'Iris-versicolor' -> [0,0,1]
+                classifications.append(classification_to_vector(classification))
                 for i in range(len(row)-1):
-                    class_col = len(row)-1
-                    classification = row[class_col]
-
-                    # 'Iris-setosa' -> [1,0,0], 'Iris-virginica' -> [0,1,0], 'Iris-versicolor' -> [0,0,1]
-                    classifications.append(classification_to_vector(classification))
-
                     data_point.append(row[i])
 
                 data_point_matrix.append(data_point)
@@ -58,19 +54,18 @@ def parse_database_into_matrix(inputFile):
 
             for row in datareader:
                 data_point = []
+                class_col = 0
+                classification = row[class_col]
+
+                # '1' -> [1,0,0], '2' -> [0,1,0], '3' -> [0,0,1]
+                classifications.append(classification_to_vector(row[0]))
 
                 for i in range(1,len(row)):
-                    class_col = 0
-                    classification = row[class_col]
-
-                    # '1' -> [1,0,0], '2' -> [0,1,0], '3' -> [0,0,1]
-                    classifications.append(classification_to_vector(row[0]))
-
                     data_point.append(row[i])
 
                 data_point_matrix.append(data_point)
 
-            return np.asarray(data_point_matrix, dtype=np.float32), classifications
+            return np.asarray(data_point_matrix, dtype=np.float32), np.asarray(classifications)
     else:
         return [],[]
 
@@ -79,7 +74,7 @@ def train_weight_vector(inputMatrix, classMatrix, inputLambda):
     X = X.T
     Y = np.asarray(classMatrix)
     conditioning_lambda = inputLambda #Arbitrarily small value to start, will vary for testing purposes
-    W = np.dot(la.inv(np.dot(X.T,X) + conditioning_lambda), np.dot(X,Y))
+    W = np.dot(la.inv(np.dot(X,X.T) + conditioning_lambda), np.dot(X,Y))
     print(W)
 
 if __name__ == '__main__':
