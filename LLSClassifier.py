@@ -5,6 +5,7 @@ import sys
 import os
 
 
+
 def parse_database_into_matrix(inputFile):
     # Full class path in case its necessary
     inputFile = os.path.abspath(inputFile)
@@ -19,21 +20,14 @@ def parse_database_into_matrix(inputFile):
         return np.asarray(data_point_matrix), np.asarray(data_point_matrix).T
 
 
-def compute_class_matrix(inputMatrix, classDiscriminatorColumn):
-    # Check if the descirminators are already in int form
-    if isinstance(inputMatrix[0][classDiscriminatorColumn], int):
-        for i in range(inputMatrix.shape):
-
-    else:
-
-
-
-def compute_weight_vector(inputMatrix, classMatrix):
-    return
-
+def train_weight_vector(inputMatrix, classMatrix, inputLambda):
+    X = np.asarray(inputMatrix)
+    Y = np.asarray(classMatrix)
+    conditioning_lambda = inputLambda #Arbitrarily small value to start, will vary for testing purposes
+    la.inv(X * X.T + conditioning_lambda)*(X*Y.T)
+    return la.inv(X * X.T + conditioning_lambda)*(X*Y.T)
 
 if __name__ == '__main__':
     inputFile = sys.argv[1]
-    X, X_t = parse_database_into_matrix(inputFile)
-    print(X)
-    print(X_t)
+    X, Y = parse_database_into_matrix(inputFile)
+
