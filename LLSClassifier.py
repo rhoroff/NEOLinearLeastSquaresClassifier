@@ -76,11 +76,13 @@ def parse_database_into_matrix(inputFile):
 
 def train_weight_vector(inputMatrix, classMatrix, inputLambda):
     X = np.asarray(inputMatrix)
+    X = X.T
     Y = np.asarray(classMatrix)
     conditioning_lambda = inputLambda #Arbitrarily small value to start, will vary for testing purposes
-    la.inv(X * X.T + conditioning_lambda)*(X*Y.T)
-    return la.inv(X * X.T + conditioning_lambda)*(X*Y.T)
+    W = np.dot(la.inv(np.dot(X.T,X) + conditioning_lambda), np.dot(X,Y))
+    print(W)
 
 if __name__ == '__main__':
     inputFile = sys.argv[1]
     X, Y = parse_database_into_matrix(inputFile)
+    train_weight_vector(X,Y, .001)
