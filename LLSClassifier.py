@@ -1,9 +1,6 @@
 import numpy as np
 import numpy.linalg as la
-import csv
-import sys
-import os
-import re
+import csv, sys, os, re
 
 
 def classification_to_vector(classification):
@@ -70,7 +67,7 @@ def parse_database_into_matrix(inputFile):
                     data_point.append(row[i])
 
                 data_point_matrix.append(data_point)
-                
+
             return np.asarray(data_point_matrix, dtype=np.float32), classifications
     else:
         return [],[]
@@ -78,4 +75,3 @@ def parse_database_into_matrix(inputFile):
 if __name__ == '__main__':
     inputFile = sys.argv[1]
     X, Y = parse_database_into_matrix(inputFile)
-
