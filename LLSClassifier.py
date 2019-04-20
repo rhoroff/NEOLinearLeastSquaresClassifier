@@ -37,14 +37,16 @@ def parse_database_into_matrix(inputFile):
                 data_point = []
 
                 for i in range(len(row)-1):
-                    last_col = len(row)-1
-                    classification = row[last_col]
+                    class_col = len(row)-1
+                    classification = row[class_col]
 
                     # 'Iris-setosa' -> [1,0,0], 'Iris-virginica' -> [0,1,0], 'Iris-versicolor' -> [0,0,1]
                     classifications.append(classification_to_vector(classification))
 
                     data_point.append(row[i])
+
                 data_point_matrix.append(data_point)
+
             return np.asarray(data_point_matrix, dtype=np.float32), classifications
 
     elif re.search("wine.data", inputFile):
@@ -54,13 +56,21 @@ def parse_database_into_matrix(inputFile):
             # data_point_matrix[0] -> classifications[0]
             data_point_matrix = []
             classifications = []
+
             for row in datareader:
                 data_point = []
+
                 for i in range(1,len(row)):
+                    class_col = 0
+                    classification = row[class_col]
+
                     # '1' -> [1,0,0], '2' -> [0,1,0], '3' -> [0,0,1]
                     classifications.append(classification_to_vector(row[0]))
+
                     data_point.append(row[i])
+
                 data_point_matrix.append(data_point)
+                
             return np.asarray(data_point_matrix, dtype=np.float32), classifications
     else:
         return [],[]
