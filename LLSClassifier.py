@@ -3,6 +3,7 @@ import numpy.linalg as la
 import csv, sys, os, re
 
 
+
 def classification_to_vector(classification):
     if classification == '1':
         return [1,0,0]
@@ -16,6 +17,7 @@ def classification_to_vector(classification):
         return [0,1,0]
     elif classification == 'Iris-versicolor':
         return [0,0,1]
+
 
 def parse_database_into_matrix(inputFile):
     # Full class path in case its necessary
@@ -71,6 +73,13 @@ def parse_database_into_matrix(inputFile):
             return np.asarray(data_point_matrix, dtype=np.float32), classifications
     else:
         return [],[]
+
+def train_weight_vector(inputMatrix, classMatrix, inputLambda):
+    X = np.asarray(inputMatrix)
+    Y = np.asarray(classMatrix)
+    conditioning_lambda = inputLambda #Arbitrarily small value to start, will vary for testing purposes
+    la.inv(X * X.T + conditioning_lambda)*(X*Y.T)
+    return la.inv(X * X.T + conditioning_lambda)*(X*Y.T)
 
 if __name__ == '__main__':
     inputFile = sys.argv[1]
