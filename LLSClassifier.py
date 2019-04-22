@@ -75,7 +75,9 @@ def train_weight_vector(inputMatrix, classMatrix, inputLambda):
     Y = np.asarray(classMatrix)
     conditioning_lambda = inputLambda #Arbitrarily small value to start, will vary for testing purposes
     W = np.dot(la.inv(np.dot(X,X.T) + conditioning_lambda), np.dot(X,Y))
-    print(W)
+
+def classify(W,x_i):
+    return 1
 
 if __name__ == '__main__':
     inputFile = sys.argv[1]
