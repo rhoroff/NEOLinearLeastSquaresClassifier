@@ -41,8 +41,15 @@ def parse_database_into_matrix(inputFile):
                     data_point.append(row[i])
 
                 data_point_matrix.append(data_point)
+            data_point_matrix = np.asarray(data_point_matrix, dtype=np.float32)
+            data_point_matrix = data_point_matrix.T
+            
+            ones = np.ones((1, data_point_matrix.shape[1]))
+            data_point_matrix = np.concatenate((data_point_matrix, ones))
+            data_point_matrix = data_point_matrix.T
+            print(data_point_matrix)
 
-            return np.asarray(data_point_matrix, dtype=np.float32), classifications
+            return data_point_matrix, classifications
 
     elif re.search("wine.data", inputFile):
         with open(inputFile) as csvfile:
@@ -64,8 +71,14 @@ def parse_database_into_matrix(inputFile):
                     data_point.append(row[i])
 
                 data_point_matrix.append(data_point)
+            data_point_matrix = np.asarray(data_point_matrix, dtype=np.float32)
+            data_point_matrix = data_point_matrix.T
+            
+            ones = np.ones((1, data_point_matrix.shape[1]))
+            data_point_matrix = np.concatenate((data_point_matrix, ones))
+            data_point_matrix = data_point_matrix.T
 
-            return np.asarray(data_point_matrix, dtype=np.float32), np.asarray(classifications)
+            return data_point_matrix, np.asarray(classifications)
     else:
         return [],[]
 
@@ -75,6 +88,9 @@ def train_weight_vector(inputMatrix, classMatrix, inputLambda):
     Y = np.asarray(classMatrix)
     conditioning_lambda = inputLambda #Arbitrarily small value to start, will vary for testing purposes
     W = np.dot(la.inv(np.dot(X,X.T) + conditioning_lambda), np.dot(X,Y))
+    calc_W = (np.asarray(la.lstsq(X.T, Y)[0]))
+
+    return W
 
 def classify(W,x_i):
     return 1
@@ -82,4 +98,4 @@ def classify(W,x_i):
 if __name__ == '__main__':
     inputFile = sys.argv[1]
     X, Y = parse_database_into_matrix(inputFile)
-    train_weight_vector(X,Y, .001)
+    W = train_weight_vector(X,Y, .001) # arbitrary lambda for now
