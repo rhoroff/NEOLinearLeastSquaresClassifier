@@ -73,16 +73,9 @@ def train_weight_vector(inputMatrix, classMatrix, inputLambda):
     X = np.asarray(inputMatrix)
     Y = np.asarray(classMatrix)
     conditioning_lambda = inputLambda #Arbitrarily small value to start, will vary for testing purposes
-    print(X.shape)
-    print(Y.shape)
-    print(np.dot(X,Y.T))
-    print(np.dot(X, X.T))
-    print(la.inv(np.dot(X, X.T) + conditioning_lambda))
-    # np.dot(la.inv(np.dot(X, X.T) + conditioning_lambda),np.dot(X,Y.T))
-    # return la.inv(X * X.T + conditioning_lambda)*(X*Y.T)
+    return np.dot(la.inv(np.dot(X.T, X) + conditioning_lambda),np.dot(X.T,Y))
 
 if __name__ == '__main__':
     inputFile = sys.argv[1]
     X, Y = parse_database_into_matrix(inputFile)
-    print(Y.shape)
-    train_weight_vector(X,Y,0.001)
+    print(train_weight_vector(X,Y,0.001))
