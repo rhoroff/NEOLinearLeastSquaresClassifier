@@ -1,9 +1,6 @@
 import numpy as np
 import numpy.linalg as la
-import csv
-import sys
-import os
-import re
+import csv, sys, os, re
 
 
 def classification_to_vector(classification):
