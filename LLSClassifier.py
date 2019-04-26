@@ -91,14 +91,11 @@ def train_weight_vector(inputMatrix, classMatrix, inputLambda):
     # Arbitrarily small value to start, will vary for testing purposes
     conditioning_lambda = inputLambda
     W = np.dot(la.inv(np.dot(X, X.T) + conditioning_lambda), np.dot(X, Y.T))
-    print(W)
-    print(la.lstsq(X.T,Y.T)[0])
 
     return W
 
 def split_data_into_training_and_testing(database, trainingPercentage):
     return 0
-
 
 if __name__ == '__main__':
     inputFile = sys.argv[1]
