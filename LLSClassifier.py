@@ -1,6 +1,9 @@
 import numpy as np
 import numpy.linalg as la
-import csv, sys, os, re
+import csv
+import sys
+import os
+import re
 
 
 def classification_to_vector(classification):
@@ -47,7 +50,7 @@ def parse_database_into_matrix(inputFile):
             #Append a 1 to every data point for the free param
             data_point_matrix = np.asarray(data_point_matrix, dtype=np.float32)
             ones = np.ones((data_point_matrix.shape[0], 1))
-            data_point_matrix = np.concatenate((data_point_matrix, ones),1)
+            data_point_matrix = np.concatenate((data_point_matrix, ones), 1)
 
             return data_point_matrix.T, np.asarray(classifications).T
 
@@ -75,7 +78,7 @@ def parse_database_into_matrix(inputFile):
             data_point_matrix = np.asarray(data_point_matrix, dtype=np.float32)
             data_point_matrix = np.asarray(data_point_matrix, dtype=np.float32)
             ones = np.ones((data_point_matrix.shape[0], 1))
-            data_point_matrix = np.concatenate((data_point_matrix, ones),1)
+            data_point_matrix = np.concatenate((data_point_matrix, ones), 1)
 
             return data_point_matrix.T, np.asarray(classifications).T
     else:
@@ -83,14 +86,16 @@ def parse_database_into_matrix(inputFile):
 
 
 def train_weight_vector(inputMatrix, classMatrix, testingLambda):
-    """
-    Args:
-        inputMatrix (2D list): The matrix containing input data points as columns and featrues as rows.
-        classMatrix (2D list): The matrix containing classifications for the inputMatrix, maps one to one based on index
-        testingLambda (float): The lambda value to be used for conditioning the weight matrix W
+    """Trains a weight vector based off an input matrix, varying values of lambda to minimize misclassification errors
 
-    Returns:
-        2D numpy.array: The weight matrix W
+    Args:\n
+        inputMatrix (2D list): The matrix containing input data points as columns and featrues as rows\n
+        classMatrix (2D list): The matrix containing classifications for the inputMatrix, maps one to one based on index\n 
+        testingLambda (float): The lambda value to be used for conditioning the weight matrix W\n
+
+    Returns:\n
+        2D numpy.array: The weight matrix W\n
+            
     """
 
     X = np.asarray(inputMatrix)
@@ -98,27 +103,37 @@ def train_weight_vector(inputMatrix, classMatrix, testingLambda):
 
     # Arbitrarily small value to start, will vary for testing purposes
     conditioning_lambda = testingLambda
-    W = np.dot(la.inv(np.dot(X, X.T) + (conditioning_lambda * np.eye(X.shape[0]))), np.dot(X, Y.T))
+    W = np.dot(la.inv(np.dot(X, X.T) +
+                      (conditioning_lambda * np.eye(X.shape[0]))), np.dot(X, Y.T))
     return W
 
-def split_data_into_training_and_testing(database, trainingPercentage):
-    """
-    Args:
-        database (list of np.arrays): A list containing an array of data points as its first entry and an array of classification for the data points as its second entry
-                                        The indices of these arrays map one to one
-        trainingPercentage (int): The percentage of testing values to split the data points and their classifications into
 
-    Returns:
-        list of list of np.arrays: A list containing two lists, the first the training set and its associated labels and the second the testing set and its associated labels
+def split_data_into_training_and_testing(database, trainingPercentage):
+    """Splits data points into training and testing sets based off of the passed in training percentage
+    Args:\n 
+        database (list of np.arrays): A list containing an array of data points as its first entry and an array of classification for the data points as its second entry.The indices of these arrays map one to one\n 
+        trainingPercentage (int): The percentage of testing values to split the data points and their classifications into\n
+
+    Returns:\n 
+        list of list of np.arrays: A list containing two lists, the first the training set and its associated labels and the second the testing set and its associated labels\n
     """
     X = database[0]
     Y = database[1]
     splitRatio = int(X.shape[1] * (.01*trainingPercentage))
-    training = [X[0:,:splitRatio], Y[0:,:splitRatio]]
-    testing = [X[0:,splitRatio:], Y[0:,splitRatio:]]
+    training = [X[0:, :splitRatio], Y[0:, :splitRatio]]
+    testing = [X[0:, splitRatio:], Y[0:, splitRatio:]]
     return training, testing
+
 
 if __name__ == '__main__':
     inputFile = sys.argv[1]
     X, Y = parse_database_into_matrix(inputFile)
-    W = train_weight_vector(X, Y, .001)  # arbitrary lambda for now
+    C = split_data_into_training_and_testing([X, Y], 50)
+    training_X = C[0][0]
+    training_Y = C[0][1]
+    testing_X = C[1][0]
+    testing_Y = C[1][1]
+
+    # arbitrary lambda for now
+    W = train_weight_vector(training_X, training_Y, .001)
+    print(W)
