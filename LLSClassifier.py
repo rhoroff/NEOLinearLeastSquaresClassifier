@@ -17,6 +17,11 @@ def classification_to_vector(classification):
     elif classification == 'Iris-versicolor':
         return [0, 0, 1]
 
+def pad_with_one(dataMatrix):
+    # Takes in a data matrix and pads it with another dimension of 1's
+    data_point_matrix = np.asarray(dataMatrix, dtype=np.float32)
+    ones = np.ones((data_point_matrix.shape[0], 1))
+    return np.concatenate((data_point_matrix, ones),1)
 
 def parse_database_into_matrix(inputFile):
     # Full class path in case its necessary
@@ -45,9 +50,7 @@ def parse_database_into_matrix(inputFile):
                 data_point_matrix.append(data_point)
 
             #Append a 1 to every data point for the free param
-            data_point_matrix = np.asarray(data_point_matrix, dtype=np.float32)
-            ones = np.ones((data_point_matrix.shape[0], 1))
-            data_point_matrix = np.concatenate((data_point_matrix, ones),1)
+            data_point_matrix = pad_with_one(data_point_matrix)
 
             return data_point_matrix.T, np.asarray(classifications).T
 
@@ -72,10 +75,7 @@ def parse_database_into_matrix(inputFile):
 
                 data_point_matrix.append(data_point)
             #Append a 1 to every data point for the free param
-            data_point_matrix = np.asarray(data_point_matrix, dtype=np.float32)
-            data_point_matrix = np.asarray(data_point_matrix, dtype=np.float32)
-            ones = np.ones((data_point_matrix.shape[0], 1))
-            data_point_matrix = np.concatenate((data_point_matrix, ones),1)
+            data_point_matrix = pad_with_one(data_point_matrix)
 
             return data_point_matrix.T, np.asarray(classifications).T
     else:
@@ -113,12 +113,17 @@ def split_data_into_training_and_testing(database, trainingPercentage):
     """
     X = database[0]
     Y = database[1]
+    # print(np.unique(Y, axis=1, return_counts=True))
     splitRatio = int(X.shape[1] * (.01*trainingPercentage))
     training = [X[0:,:splitRatio], Y[0:,:splitRatio]]
-    testing = [X[0:,splitRatio:], Y[0:,splitRatio:]]
+    # print(training[0].shape)
+    testing = np.asarray([X[0:,splitRatio:], Y[0:,splitRatio:]])
+    # print(testing[0].shape)
     return training, testing
 
 if __name__ == '__main__':
     inputFile = sys.argv[1]
     X, Y = parse_database_into_matrix(inputFile)
-    W = train_weight_vector(X, Y, .001)  # arbitrary lambda for now
+
+    a,b = split_data_into_training_and_testing([X,Y], 50)
+    # W = train_weight_vector(X, Y, .001)  # arbitrary lambda for now

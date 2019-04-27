@@ -12,12 +12,16 @@ def test_classifier(classifier, X):
 
 if __name__ == '__main__':
     # Training data X -> features, Y -> labels
-    X = np.array([[-1, -1], [-2, -1], [1, 1], [2, 1], [0,0]])
-    Y = np.array([1, 1, 2, 2, 3])
+    training_data = np.array([[-1, -1], [-2, -1], [1, 1], [2, 1], [0,0]])
+    training_classes = np.array([1, 1, 2, 2, 3])
 
     # initialize the support vector class
     classifier = SVC(gamma='auto')
 
-    classifier = train_classifier(classifier, X, Y)
+    classifier = train_classifier(classifier, training_data, training_classes)
 
-    print(test_classifier(classifier, [[1,0]]))
+    testing_data = np.array([[-1, -1], [-2, -1], [1, 1], [2, 1], [0,0], [-9,-9]])
+    testing_classes = np.array([1, 1, 2, 2, 3, 1])
+    predictions = test_classifier(classifier, testing_data)
+
+    print(testing_classes - predictions)
