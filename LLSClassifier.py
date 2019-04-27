@@ -82,17 +82,41 @@ def parse_database_into_matrix(inputFile):
         return [], []
 
 
-def train_weight_vector(inputMatrix, classMatrix, inputLambda):
+def train_weight_vector(inputMatrix, classMatrix, testingLambda):
+    """
+    Args:
+        inputMatrix (2D list): The matrix containing input data points as columns and featrues as rows.
+        classMatrix (2D list): The matrix containing classifications for the inputMatrix, maps one to one based on index
+        testingLambda (float): The lambda value to be used for conditioning the weight matrix W
+
+    Returns:
+        2D numpy.array: The weight matrix W
+    """
+
     X = np.asarray(inputMatrix)
     Y = np.asarray(classMatrix)
-    # Arbitrarily small value to start, will vary for testing purposes
-    conditioning_lambda = inputLambda
-    W = np.dot(la.inv(np.dot(X, X.T) + conditioning_lambda), np.dot(X, Y.T))
 
+    # Arbitrarily small value to start, will vary for testing purposes
+    conditioning_lambda = testingLambda
+    W = np.dot(la.inv(np.dot(X, X.T) + (conditioning_lambda * np.eye(X.shape[0]))), np.dot(X, Y.T))
     return W
 
 def split_data_into_training_and_testing(database, trainingPercentage):
-    return 0
+    """
+    Args:
+        database (list of np.arrays): A list containing an array of data points as its first entry and an array of classification for the data points as its second entry
+                                        The indices of these arrays map one to one
+        trainingPercentage (int): The percentage of testing values to split the data points and their classifications into
+
+    Returns:
+        list of list of np.arrays: A list containing two lists, the first the training set and its associated labels and the second the testing set and its associated labels
+    """
+    X = database[0]
+    Y = database[1]
+    splitRatio = int(X.shape[1] * (.01*trainingPercentage))
+    training = [X[0:,:splitRatio], Y[0:,:splitRatio]]
+    testing = [X[0:,splitRatio:], Y[0:,splitRatio:]]
+    return training, testing
 
 if __name__ == '__main__':
     inputFile = sys.argv[1]
