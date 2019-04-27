@@ -93,20 +93,20 @@ def train_weight_vector(inputMatrix, classMatrix, inputLambda):
 
 def split_data_into_training_and_testing(database, trainingPercentage):
     #trainingPercentage needs to be a decimal please!
+    dbase = database
     sets = []
     tests = []
     percent = trainingPercentage
-    len = database.shape[0]
-    for rows in range(database.shape[0]):
+    for rows in range(dbase.shape[1]):
         row = []
         if percent >= 1:
-            for i in range(len):
-                row.append(database[rows][i])
+            for i in range(dbase.shape[0]):
+                row.append(dbase[i][rows])
             tests.append(row)
             percent = trainingPercentage
         else:
-            for i in range(database.shape[0]):
-                row.append(database[rows][i])
+            for i in range(dbase.shape[0]):
+                row.append(dbase[i][rows])
             sets.append(row)
             percent *= 2
     return sets, tests
@@ -115,3 +115,4 @@ if __name__ == '__main__':
     inputFile = sys.argv[1]
     X, Y = parse_database_into_matrix(inputFile)
     W = train_weight_vector(X, Y, .001)  # arbitrary lambda for now
+    stuff, tests = split_data_into_training_and_testing(X.T, .5)
