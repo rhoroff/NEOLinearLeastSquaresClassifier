@@ -117,11 +117,40 @@ def split_data_into_training_and_testing(database, trainingPercentage):
     Returns:\n 
         list of list of np.arrays: A list containing two lists, the first the training set and its associated labels and the second the testing set and its associated labels\n
     """
-    X = database[0]
-    Y = database[1]
-    splitRatio = int(X.shape[1] * (.01*trainingPercentage))
-    training = [X[0:, :splitRatio], Y[0:, :splitRatio]]
-    testing = [X[0:, splitRatio:], Y[0:, splitRatio:]]
+    X = np.asarray(database[0])
+    Y = np.asarray(database[1])
+    #Easier to work with tranposed data
+    X_t = X.T 
+    Y_t = Y.T 
+    (classes, numberOfEachClass) = np.unique(Y_t, return_counts=True, axis = 0)
+    training = [[], []]
+    testing = [[],[]]
+    numElsInTraining = int(X.shape[1] * (.01*trainingPercentage))
+    numElsPerClass = int(numElsInTraining / numberOfEachClass.shape[0])
+    for classification in classes:
+        counter = 0
+        for i in range(Y_t.shape[0] - 1):
+            if (np.array_equal(Y_t[i], classification)) and counter < numElsPerClass:
+                training[0].append(X_t[i])
+                training[1].append(Y_t[i])
+                np.delete(X_t, i, axis = 0)
+                np.delete(Y_t,i, axis = 0)
+                i = 0
+                counter = counter + 1
+
+    training[0] = np.asarray(training[0]).T
+    training[1] = np.asarray(training[1]).T
+    print(training[0].shape[1])
+    print(training[1].shape[1])
+    print(np.unique(training[1], return_counts=True, axis = 1))
+    testing = [X_t.T, Y_t.T]
+    print(testing[0].shape[1])
+    print(testing[0].shape[1])
+    # print(training)
+    # print(testing.shape[1])
+    # print(testing)
+    # training = [X[0:, :numElsInTraining], Y[0:, :numElsInTraining]]
+    # testing = [X[0:, numElsInTraining:], Y[0:, numElsInTraining:]]
     return training, testing
 
 
@@ -129,11 +158,11 @@ if __name__ == '__main__':
     inputFile = sys.argv[1]
     X, Y = parse_database_into_matrix(inputFile)
     C = split_data_into_training_and_testing([X, Y], 50)
-    training_X = C[0][0]
-    training_Y = C[0][1]
-    testing_X = C[1][0]
-    testing_Y = C[1][1]
+    # training_X = C[0][0]
+    # training_Y = C[0][1]
+    # testing_X = C[1][0]
+    # testing_Y = C[1][1]
 
     # arbitrary lambda for now
-    W = train_weight_vector(training_X, training_Y, .001)
+    # W = train_weight_vector(training_X, training_Y, .001)
     print(W)
