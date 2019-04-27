@@ -115,7 +115,7 @@ def split_data_into_training_and_testing(database, trainingPercentage):
     Y = database[1]
     splitRatio = int(X.shape[1] * (.01*trainingPercentage))
     training = [X[0:,:splitRatio], Y[0:,:splitRatio]]
-    testing = [X[0:,splitRatio:],X[0:,splitRatio:]]
+    testing = [X[0:,splitRatio:], Y[0:,splitRatio:]]
     return training, testing
 
 if __name__ == '__main__':
