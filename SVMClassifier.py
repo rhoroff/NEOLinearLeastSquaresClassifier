@@ -23,5 +23,5 @@ if __name__ == '__main__':
     testing_data = np.array([[-1, -1], [-2, -1], [1, 1], [2, 1], [0,0], [-9,-9], [-9,-9]])
     testing_classes = np.array([1, 1, 2, 2, 3, 1, 1])
     predictions = test_classifier(classifier, testing_data)
-
-    print(list(range(1,testing_classes.shape[0]+1)) - (np.where(np.equal(testing_classes, predictions))))
+    print(np.where(np.equal(testing_classes, predictions))[0].tolist())
+    print(np.setdiff1d(list(range(0,testing_classes.shape[0])), np.where(np.equal(testing_classes, predictions))[0].tolist()))
