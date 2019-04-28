@@ -4,6 +4,7 @@ import csv
 import sys
 import os
 import re
+import math
 
 
 def classification_to_vector(classification):
@@ -120,13 +121,13 @@ def split_data_into_training_and_testing(database, trainingPercentage):
     X = np.asarray(database[0])
     Y = np.asarray(database[1])
     #Easier to work with tranposed data
-    X_t = X.T 
-    Y_t = Y.T 
-    (classes, numberOfEachClass) = np.unique(Y_t, return_counts=True, axis = 0)
+    X_t = X.T
+    Y_t = Y.T
+    (classes, numberOfEachClass) = np.unique(Y_t, return_counts=True, axis=0)
     training = [[], []]
-    testing = [[],[]]
+    testing = [[], []]
     numElsInTraining = int(X.shape[1] * (.01*trainingPercentage))
-    numElsPerClass = int(numElsInTraining / numberOfEachClass.shape[0])
+    numElsPerClass = math.ceil(numElsInTraining / numberOfEachClass.shape[0])
     for classification in classes:
         counter = 0
         i = 0
@@ -134,8 +135,8 @@ def split_data_into_training_and_testing(database, trainingPercentage):
             if (np.array_equal(Y_t[i], classification)) and counter < numElsPerClass:
                 training[0].append(X_t[i])
                 training[1].append(Y_t[i])
-                X_t = np.delete(X_t, i, axis = 0)
-                Y_t = np.delete(Y_t, i, axis = 0)
+                X_t = np.delete(X_t, i, axis=0)
+                Y_t = np.delete(Y_t, i, axis=0)
                 i = 0
                 counter = counter + 1
             else:
@@ -145,7 +146,7 @@ def split_data_into_training_and_testing(database, trainingPercentage):
     training[1] = np.asarray(training[1]).T
     print(training[0].shape[1])
     print(training[1].shape[1])
-    print(np.unique(training[1], return_counts=True, axis = 1))
+    print(np.unique(training[1], return_counts=True, axis=1))
     testing = [X_t.T, Y_t.T]
     print(testing[0].shape[1])
     print(testing[0].shape[1])
@@ -155,6 +156,46 @@ def split_data_into_training_and_testing(database, trainingPercentage):
     # training = [X[0:, :numElsInTraining], Y[0:, :numElsInTraining]]
     # testing = [X[0:, numElsInTraining:], Y[0:, numElsInTraining:]]
     return training, testing
+
+def classify(W, x_i):
+    """Classifies x_i as one of the classes in W by multiplying each W_n with x_i and taking the largest of the three to be the class that x_i belongs to
+    
+    Arguments:
+        W (2D np.array) -- a weight vector, made using the Linear Least Squares Classification method, each column contains a series of weights corresponding to an input class
+        x_i (1D np.array) -- a data point to be classified
+    
+    Returns:
+        classificationofX_i (1D np.array) -- the classification that x_i is calculated to have belonged too based off of the weight vector W
+    """
+    classification = np.eye(W.shape[1])
+    curMax = np.dot(W.T[0], x_i)
+    curMaxIndex = 0
+    i = 1
+    for i in range(W.shape[1]):
+        if np.dot(W.T[i], x_i) > curMax: #Tranpsose makes things easier
+            curMax = np.dot(W.T[i], x_i)
+            curMaxIndex = i
+    classificationOfX_i = classification.T[curMaxIndex].T
+    return classificationOfX_i
+
+def classify_set_of_data_points(W, X):
+    """Classifies a whole set of data points against a weight vector W
+    
+    Arguments:
+        W (2D np.array) -- the weight vector W used for containing class weights for data points 
+        X (2D np.array) -- a vector of input data points to classify
+
+    Returns: 
+        classesOfX (2D np.array) -- a matrix of classification that maps one to one to the indices of the input matrix X
+    """
+    classesOfX = [[]]
+    X = X.T
+    for i in range(X.shape[0]): #Easier to work with tranposes
+        print(classify(W, X[i]))
+        classesOfX = np.append(classesOfX[0], classify(W, X[i]).T)
+    print(classesOfX)
+    return classesOfX
+    
 
 
 if __name__ == '__main__':
@@ -168,4 +209,4 @@ if __name__ == '__main__':
 
     # arbitrary lambda for now
     W = train_weight_vector(training_X, training_Y, .001)
-    print(W)
+    classify_set_of_data_points(W, testing_X)
