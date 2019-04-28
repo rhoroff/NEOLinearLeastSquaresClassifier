@@ -129,14 +129,17 @@ def split_data_into_training_and_testing(database, trainingPercentage):
     numElsPerClass = int(numElsInTraining / numberOfEachClass.shape[0])
     for classification in classes:
         counter = 0
-        for i in range(Y_t.shape[0] - 1):
+        i = 0
+        while i < Y_t.shape[0]:
             if (np.array_equal(Y_t[i], classification)) and counter < numElsPerClass:
                 training[0].append(X_t[i])
                 training[1].append(Y_t[i])
-                np.delete(X_t, i, axis = 0)
-                np.delete(Y_t,i, axis = 0)
+                X_t = np.delete(X_t, i, axis = 0)
+                Y_t = np.delete(Y_t, i, axis = 0)
                 i = 0
                 counter = counter + 1
+            else:
+                i = i + 1
 
     training[0] = np.asarray(training[0]).T
     training[1] = np.asarray(training[1]).T
@@ -158,11 +161,11 @@ if __name__ == '__main__':
     inputFile = sys.argv[1]
     X, Y = parse_database_into_matrix(inputFile)
     C = split_data_into_training_and_testing([X, Y], 50)
-    # training_X = C[0][0]
-    # training_Y = C[0][1]
-    # testing_X = C[1][0]
-    # testing_Y = C[1][1]
+    training_X = C[0][0]
+    training_Y = C[0][1]
+    testing_X = C[1][0]
+    testing_Y = C[1][1]
 
     # arbitrary lambda for now
-    # W = train_weight_vector(training_X, training_Y, .001)
+    W = train_weight_vector(training_X, training_Y, .001)
     print(W)
