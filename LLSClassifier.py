@@ -93,7 +93,7 @@ def train_weight_vector(inputMatrix, classMatrix, inputLambda):
 
 def split_data_into_training_and_testing(database, trainingPercentage):
     #trainingPercentage needs to be a decimal please!
-    dbase = database
+    dbase = database.T
     sets = []
     tests = []
     percent = trainingPercentage
