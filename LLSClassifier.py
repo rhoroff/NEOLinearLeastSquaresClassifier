@@ -153,8 +153,9 @@ def split_data_into_training_and_testing(database, trainingPercentage):
     # testing = [X[0:, numElsInTraining:], Y[0:, numElsInTraining:]]
     return training, testing
 
+
 def classify(W, x_i):
-    """Classifies x_i as one of the classes in W by multiplying each W_n with x_i and taking the largest of the three to be the class that x_i belongs to
+    """Classifies x_i as one of the classes in W by multiplying each W_k with x_i and taking the largest of the three to be the class that x_i belongs to
     
     Arguments:
         W (2D np.array) -- a weight vector, made using the Linear Least Squares Classification method, each column contains a series of weights corresponding to an input class
@@ -168,11 +169,12 @@ def classify(W, x_i):
     curMaxIndex = 0
     i = 1
     for i in range(W.shape[1]):
-        if np.dot(W.T[i], x_i) > curMax: #Tranpsose makes things easier
+        if np.dot(W.T[i], x_i) > curMax:  # Tranpsose makes things easier
             curMax = np.dot(W.T[i], x_i)
             curMaxIndex = i
     classificationOfX_i = classification.T[curMaxIndex].T
     return classificationOfX_i
+
 
 def classify_set_of_data_points(W, X):
     """Classifies a whole set of data points against a weight vector W
@@ -186,12 +188,17 @@ def classify_set_of_data_points(W, X):
     """
     classesOfX = []
     X = X.T
-    for i in range(X.shape[0]): #Easier to work with tranposes
-        print(classify(W, X[i]))
+    for i in range(X.shape[0]):  # Easier to work with tranposes
         classesOfX.append(classify(W, X[i]))
     # print(np.asarray(classesOfX))
-    return np.asarray(classesOfX, dtype = int).T
-    
+    return np.asarray(classesOfX, dtype=int).T
+
+def check_miscalculations(knownClasses, learnedClasses):
+    numMisclassifications = 0
+    for i in range(knownClasses.shape[1]):
+        if not (np.array_equal(knownClasses.T[i], learnedClasses.T[i])) :
+            numMisclassifications = numMisclassifications + 1
+    return numMisclassifications
 
 
 if __name__ == '__main__':
@@ -206,3 +213,4 @@ if __name__ == '__main__':
     # arbitrary lambda for now
     W = train_weight_vector(training_X, training_Y, .001)
     tested_Y = classify_set_of_data_points(W, testing_X)
+    print(check_miscalculations(testing_Y, tested_Y))
