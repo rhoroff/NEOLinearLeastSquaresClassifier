@@ -144,12 +144,8 @@ def split_data_into_training_and_testing(database, trainingPercentage):
 
     training[0] = np.asarray(training[0]).T
     training[1] = np.asarray(training[1]).T
-    print(training[0].shape[1])
-    print(training[1].shape[1])
     print(np.unique(training[1], return_counts=True, axis=1))
     testing = [X_t.T, Y_t.T]
-    print(testing[0].shape[1])
-    print(testing[0].shape[1])
     # print(training)
     # print(testing.shape[1])
     # print(testing)
@@ -188,13 +184,13 @@ def classify_set_of_data_points(W, X):
     Returns: 
         classesOfX (2D np.array) -- a matrix of classification that maps one to one to the indices of the input matrix X
     """
-    classesOfX = [[]]
+    classesOfX = []
     X = X.T
     for i in range(X.shape[0]): #Easier to work with tranposes
         print(classify(W, X[i]))
-        classesOfX = np.append(classesOfX[0], classify(W, X[i]).T)
-    print(classesOfX)
-    return classesOfX
+        classesOfX.append(classify(W, X[i]))
+    # print(np.asarray(classesOfX))
+    return np.asarray(classesOfX, dtype = int).T
     
 
 
@@ -209,4 +205,4 @@ if __name__ == '__main__':
 
     # arbitrary lambda for now
     W = train_weight_vector(training_X, training_Y, .001)
-    classify_set_of_data_points(W, testing_X)
+    tested_Y = classify_set_of_data_points(W, testing_X)
