@@ -1,10 +1,6 @@
 import numpy as np
 import numpy.linalg as la
-import csv
-import sys
-import os
-import re
-import math
+import csv, sys, os, re, math
 
 
 def classification_to_vector(classification):
@@ -98,7 +94,6 @@ def train_weight_vector(inputMatrix, classMatrix, testingLambda):
         2D numpy.array: The weight matrix W\n
             
     """
-
     X = np.asarray(inputMatrix)
     Y = np.asarray(classMatrix)
 
@@ -144,7 +139,7 @@ def split_data_into_training_and_testing(database, trainingPercentage):
 
     training[0] = np.asarray(training[0]).T
     training[1] = np.asarray(training[1]).T
-    print(np.unique(training[1], return_counts=True, axis=1))
+    # print(np.unique(training[1], return_counts=True, axis=1))
     testing = [X_t.T, Y_t.T]
     # print(training)
     # print(testing.shape[1])
@@ -162,7 +157,7 @@ def classify(W, x_i):
         x_i (1D np.array) -- a data point to be classified
     
     Returns:
-        classificationofX_i (1D np.array) -- the classification that x_i is calculated to have belonged too based off of the weight vector W
+        classificationofX_i (1D np.array) -- the classification that x_i is calculated to have belonged to based off of the weight vector W
     """
     classification = np.eye(W.shape[1])
     curMax = np.dot(W.T[0], x_i)
@@ -204,13 +199,16 @@ def check_miscalculations(knownClasses, learnedClasses):
 if __name__ == '__main__':
     inputFile = sys.argv[1]
     X, Y = parse_database_into_matrix(inputFile)
-    C = split_data_into_training_and_testing([X, Y], 50)
-    training_X = C[0][0]
-    training_Y = C[0][1]
-    testing_X = C[1][0]
-    testing_Y = C[1][1]
+    testingTrainingPercentage = [50,60, 70,80,90]
+    for percentage in testingTrainingPercentage:
+        C = split_data_into_training_and_testing([X, Y], percentage)
+        training_X = C[0][0]
+        training_Y = C[0][1]
+        testing_X = C[1][0]
+        testing_Y = C[1][1]
 
-    # arbitrary lambda for now
-    W = train_weight_vector(training_X, training_Y, .001)
-    tested_Y = classify_set_of_data_points(W, testing_X)
-    print(check_miscalculations(testing_Y, tested_Y))
+        # arbitrary lambda for now
+        W = train_weight_vector(training_X, training_Y, .001)
+        tested_Y = classify_set_of_data_points(W, testing_X)
+        print(check_miscalculations(testing_Y, tested_Y))
+
