@@ -45,41 +45,49 @@ def classification_error(labels, predictions):
     error_labels = labels[error_indices]
 
     # Find the number of errors per class
-    error_labels_uniques = np.unique(error_labels, return_counts=True, axis = 0)
+    if error_labels.shape[0] != 0:
+        error_labels_uniques = np.unique(error_labels, return_counts=True, axis = 0)
 
-    # Build a dictionary of key = label and value = count of errors
-    N_errors_per_label = dict((str(key), value) for (key, value) in zip(error_labels_uniques[0], error_labels_uniques[1]))
-
+        # Build a dictionary of key = label and value = count of errors
+        N_errors_per_label = dict((str(key), value) for (key, value) in zip(error_labels_uniques[0], error_labels_uniques[1]))
+    else:
+        N_errors_per_label = {}
     return N_errors_per_label
 
 if __name__ == '__main__':
+    paths = [
+        '/Source/numerical-analysis/NEOLinearLeastSquaresClassifier/WineDatabase/wine.data',
+        '/Source/numerical-analysis/NEOLinearLeastSquaresClassifier/CMCDatabase/cmc.data',
+        '/Source/numerical-analysis/NEOLinearLeastSquaresClassifier/CaesarianDatabase/caesarian.data',
+        '/Source/numerical-analysis/NEOLinearLeastSquaresClassifier/IrisDatabase/iris.data'
+    ]
+    for path in paths:
+        data_points, labels = parse_database_into_matrix(path)
+        print(path)
+        for p in [50,60,70,80,90]:
+            data_split = split_data_into_training_and_testing([data_points, labels], p)
 
-    # data_points, labels = parse_database_into_matrix('/Source/numerical-analysis/NEOLinearLeastSquaresClassifier/WineDatabase/wine.data')
-    data_points, labels = parse_database_into_matrix('/Source/numerical-analysis/NEOLinearLeastSquaresClassifier/IrisDatabase/iris.data')
+            # Training data X -> features, Y -> labels
+            training_data = data_split[0][0].T
+            training_labels = data_split[0][1]
 
-    data_split = split_data_into_training_and_testing([data_points, labels], 50)
+            training_labels = np.asarray(list(vector_to_classification(v) for v in training_labels.T.tolist()))
 
-    # Training data X -> features, Y -> labels
-    training_data = data_split[0][0].T
-    training_labels = data_split[0][1]
+            # Testing data X -> features, Y -> labels
+            testing_data = data_split[1][0].T
+            testing_labels = data_split[1][1]
 
-    training_labels = np.asarray(list(vector_to_classification(v) for v in training_labels.T.tolist()))
+            # print(testing_data)
 
-    # Testing data X -> features, Y -> labels
-    testing_data = data_split[1][0].T
-    testing_labels = data_split[1][1]
+            testing_labels = np.asarray(list(vector_to_classification(v) for v in testing_labels.T.tolist()))
 
-    # print(testing_data)
+            # print(testing_labels)
+            # initialize the support vector class
+            classifier = SVC(gamma='auto')
 
-    testing_labels = np.asarray(list(vector_to_classification(v) for v in testing_labels.T.tolist()))
+            classifier = train_classifier(classifier, training_data, training_labels)
 
-    # print(testing_labels)
-    # initialize the support vector class
-    classifier = SVC(gamma='auto')
+            predictions = test_classifier(classifier, testing_data)
 
-    classifier = train_classifier(classifier, training_data, training_labels)
-
-    predictions = test_classifier(classifier, testing_data)
-
-    # Find the misclassification error per class
-    print(classification_error(testing_labels, predictions))
+            # Find the misclassification error per class
+            print(classification_error(testing_labels, predictions))
