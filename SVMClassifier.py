@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.svm import SVC
 import collections, functools, operator 
-
+from LLSClassifier import parse_database_into_matrix, split_data_into_training_and_testing
 
 def train_classifier(classifier, X, y):
     # train the classifier with the data
@@ -22,13 +22,21 @@ def classification_percent_error(errors_per_label, labels):
 
     return {k: errors_per_label[k]/N_per_label[k] for k in N_per_label.keys() & errors_per_label}
 
+def vector_to_classification(vector):
+    if vector == [1, 0, 0]:
+        return '1'
+    elif vector == [0, 1, 0]:
+        return '2'
+    elif vector == [0, 0, 1]:
+        return '3'
 
 def classification_error(labels, predictions):
+
     # Generate a list of indices for the entire set of labels
-    label_indices = list(range(0,testing_classes.shape[0]))
+    label_indices = list(range(0,labels.shape[0]))
 
     # Find the indices that are correct
-    non_error_indices = np.where(np.equal(testing_classes, predictions))[0].tolist()
+    non_error_indices = np.where(labels == predictions)[0].tolist()
 
     # Find the indices that are NOT correct
     error_indices = np.setdiff1d(label_indices, non_error_indices)
@@ -45,19 +53,33 @@ def classification_error(labels, predictions):
     return N_errors_per_label
 
 if __name__ == '__main__':
-    # Training data X -> features, Y -> labels
-    training_data = np.array([[-1, -1], [-2, -1], [1, 1], [2, 1], [0,0]])
-    training_classes = np.array([1, 1, 2, 2, 3])
 
+    # data_points, labels = parse_database_into_matrix('/Source/numerical-analysis/NEOLinearLeastSquaresClassifier/WineDatabase/wine.data')
+    data_points, labels = parse_database_into_matrix('/Source/numerical-analysis/NEOLinearLeastSquaresClassifier/IrisDatabase/iris.data')
+
+    data_split = split_data_into_training_and_testing([data_points, labels], 50)
+
+    # Training data X -> features, Y -> labels
+    training_data = data_split[0][0].T
+    training_labels = data_split[0][1]
+
+    training_labels = np.asarray(list(vector_to_classification(v) for v in training_labels.T.tolist()))
+
+    # Testing data X -> features, Y -> labels
+    testing_data = data_split[1][0].T
+    testing_labels = data_split[1][1]
+
+    # print(testing_data)
+
+    testing_labels = np.asarray(list(vector_to_classification(v) for v in testing_labels.T.tolist()))
+
+    # print(testing_labels)
     # initialize the support vector class
     classifier = SVC(gamma='auto')
 
-    classifier = train_classifier(classifier, training_data, training_classes)
-
-    testing_data = np.array([[-1, -1], [-2, -1], [1, 1], [2, 1], [0,0], [-9,-9], [-9,-9]])
-    testing_classes = np.array([1, 1, 2, 2, 3, 1, 1])
+    classifier = train_classifier(classifier, training_data, training_labels)
 
     predictions = test_classifier(classifier, testing_data)
 
     # Find the misclassification error per class
-    print(classification_error(testing_classes, predictions))
+    print(classification_error(testing_labels, predictions))

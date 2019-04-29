@@ -12,9 +12,9 @@ def classification_to_vector(classification):
         return [0, 0, 1]
     elif classification == 'Iris-setosa':
         return [1, 0, 0]
-    elif classification == 'Iris-virginica':
-        return [0, 1, 0]
     elif classification == 'Iris-versicolor':
+        return [0, 1, 0]
+    elif classification == 'Iris-virginica':
         return [0, 0, 1]
 
 def pad_with_one(dataMatrix):
