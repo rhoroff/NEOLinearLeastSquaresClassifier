@@ -90,12 +90,11 @@ def parse_database_into_matrix(inputFile):
 
             for row in datareader:
                 data_point = []
-                class_col = 3
+                class_col = 0
                 classification = row[class_col]
 
                 # '1' -> [1,0], '2' -> [0,1[]
-                classification = classification_to_vector(row[3])
-                classification.pop(2)
+                classification = classification_to_vector(row[0])
                 classifications.append(classification)
 
                 for i in range(1, len(row)):
