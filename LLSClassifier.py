@@ -61,11 +61,13 @@ def parse_database_into_matrix(inputFile):
 
             for row in datareader:
                 data_point = []
-                class_col = 0
+                class_col = 3
                 classification = row[class_col]
 
-                # '1' -> [1,0,0], '2' -> [0,1,0], '3' -> [0,0,1]
-                classifications.append(classification_to_vector(row[0]))
+                # '1' -> [1,0], '2' -> [0,1[]
+                classification = classification_to_vector(row[3])
+                classification.pop(2)
+                classifications.append(classification)
 
                 for i in range(1, len(row)):
                     data_point.append(row[i])
@@ -78,7 +80,34 @@ def parse_database_into_matrix(inputFile):
             data_point_matrix = np.concatenate((data_point_matrix, ones), 1)
 
             return data_point_matrix.T, np.asarray(classifications).T
-    elif re.search("wine.data", inputFile):
+    elif re.search("cmc.data", inputFile):
+        with open(inputFile) as csvfile:
+            datareader = csv.reader(csvfile)
+
+            # data_point_matrix[0] -> classifications[0]
+            data_point_matrix = []
+            classifications = []
+
+            for row in datareader:
+                data_point = []
+                class_col = 9
+                classification = row[class_col]
+
+                # '1' -> [1,0,0], '2' -> [0,1,0], '3' -> [0,0,1]
+                classifications.append(classification_to_vector(row[9]))
+
+                for i in range(1, len(row)):
+                    data_point.append(row[i])
+
+                data_point_matrix.append(data_point)
+            #Append a 1 to every data point for the free param
+            data_point_matrix = np.asarray(data_point_matrix, dtype=np.float32)
+            data_point_matrix = np.asarray(data_point_matrix, dtype=np.float32)
+            ones = np.ones((data_point_matrix.shape[0], 1))
+            data_point_matrix = np.concatenate((data_point_matrix, ones), 1)
+
+            return data_point_matrix.T, np.asarray(classifications).T
+    elif re.search("haberman.data", inputFile):
         with open(inputFile) as csvfile:
             datareader = csv.reader(csvfile)
 
@@ -92,7 +121,7 @@ def parse_database_into_matrix(inputFile):
                 classification = row[class_col]
 
                 # '1' -> [1,0,0], '2' -> [0,1,0], '3' -> [0,0,1]
-                classifications.append(classification_to_vector(row[0]))
+                classifications.append(classification_to_vector(row[3]))
 
                 for i in range(1, len(row)):
                     data_point.append(row[i])
