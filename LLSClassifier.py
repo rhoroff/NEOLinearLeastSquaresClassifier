@@ -16,6 +16,8 @@ def classification_to_vector(classification):
         return [0, 1, 0]
     elif classification == 'Iris-versicolor':
         return [0, 0, 1]
+    elif classification == '0':
+        return [0,1,0]
 
 
 def parse_database_into_matrix(inputFile):
@@ -117,7 +119,7 @@ def parse_database_into_matrix(inputFile):
 
             for row in datareader:
                 data_point = []
-                class_col = 0
+                class_col = len(row)-1
                 classification = row[class_col]
 
                 # '1' -> [1,0,0], '2' -> [0,1,0], '3' -> [0,0,1]
@@ -127,8 +129,8 @@ def parse_database_into_matrix(inputFile):
                     data_point.append(row[i])
 
                 data_point_matrix.append(data_point)
+
             #Append a 1 to every data point for the free param
-            data_point_matrix = np.asarray(data_point_matrix, dtype=np.float32)
             data_point_matrix = np.asarray(data_point_matrix, dtype=np.float32)
             ones = np.ones((data_point_matrix.shape[0], 1))
             data_point_matrix = np.concatenate((data_point_matrix, ones), 1)
