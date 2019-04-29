@@ -168,6 +168,7 @@ def classify(W, x_i):
             curMax = np.dot(W.T[i], x_i)
             curMaxIndex = i
     classificationOfX_i = classification.T[curMaxIndex].T
+
     return classificationOfX_i
 
 
@@ -195,20 +196,72 @@ def check_miscalculations(knownClasses, learnedClasses):
             numMisclassifications = numMisclassifications + 1
     return numMisclassifications
 
+def vector_to_classification(vector):
+    if vector == [1, 0, 0]:
+        return '1'
+    elif vector == [0, 1, 0]:
+        return '2'
+    elif vector == [0, 0, 1]:
+        return '3'
+
+# if __name__ == '__main__':
+#     inputFile = sys.argv[1]
+#     X, Y = parse_database_into_matrix(inputFile)
+#     testingTrainingPercentage = [50,60, 70,80,90]
+#     for percentage in testingTrainingPercentage:
+#         C = split_data_into_training_and_testing([X, Y], percentage)
+#         training_X = C[0][0]
+#         training_Y = C[0][1]
+#         testing_X = C[1][0]
+#         testing_Y = C[1][1]
+
+#         # arbitrary lambda for now
+#         W = train_weight_vector(training_X, training_Y, .001)
+#         tested_Y = classify_set_of_data_points(W, testing_X)
+#         print(check_miscalculations(testing_Y, tested_Y))
+
+def classification_error(labels, predictions):
+
+    # Generate a list of indices for the entire set of labels
+    label_indices = list(range(0,labels.shape[0]))
+
+    # Find the indices that are correct
+    non_error_indices = np.where(labels == predictions)[0].tolist()
+
+    # Find the indices that are NOT correct
+    error_indices = np.setdiff1d(label_indices, non_error_indices)
+
+    # Find the original labels that were misclassified
+    error_labels = labels[error_indices]
+
+    # Find the number of errors per class
+    error_labels_uniques = np.unique(error_labels, return_counts=True, axis = 0)
+
+    # Build a dictionary of key = label and value = count of errors
+    N_errors_per_label = dict((str(key), value) for (key, value) in zip(error_labels_uniques[0], error_labels_uniques[1]))
+
+    return N_errors_per_label
+
+def perctange_based_training(data, labels, percentage):
+    C = split_data_into_training_and_testing([data, labels], percentage)
+    training_X = C[0][0]
+    training_Y = C[0][1]
+    testing_X = C[1][0]
+    testing_Y = C[1][1]
+
+    # arbitrary lambda for now
+    W = train_weight_vector(training_X, training_Y, .001)
+    tested_Y = classify_set_of_data_points(W, testing_X)
+
+    labels = np.asarray(list(vector_to_classification(v) for v in testing_Y.T.tolist()))
+    predictions = np.asarray(list(vector_to_classification(v) for v in tested_Y.T.tolist()))
+
+    print(classification_error(labels, predictions))    
 
 if __name__ == '__main__':
     inputFile = sys.argv[1]
     X, Y = parse_database_into_matrix(inputFile)
-    testingTrainingPercentage = [50,60, 70,80,90]
-    for percentage in testingTrainingPercentage:
-        C = split_data_into_training_and_testing([X, Y], percentage)
-        training_X = C[0][0]
-        training_Y = C[0][1]
-        testing_X = C[1][0]
-        testing_Y = C[1][1]
+    for p in [50,60,70,80,90]:
+        perctange_based_training(X,Y,p)
 
-        # arbitrary lambda for now
-        W = train_weight_vector(training_X, training_Y, .001)
-        tested_Y = classify_set_of_data_points(W, testing_X)
-        print(check_miscalculations(testing_Y, tested_Y))
-
+    # print(check_miscalculations(testing_Y, tested_Y))
