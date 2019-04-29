@@ -52,7 +52,34 @@ def parse_database_into_matrix(inputFile):
             data_point_matrix = np.concatenate((data_point_matrix, ones), 1)
 
             return data_point_matrix.T, np.asarray(classifications).T
+    # different datasets requires different parsing methods, use regex to filter
+    elif re.search("caesarian.data", inputFile):
+        with open(inputFile) as csvfile:
+            datareader = csv.reader(csvfile)
 
+            # data_point_matrix[0] -> classifications[0]
+            data_point_matrix = []
+            classifications = []
+
+            for row in datareader:
+                data_point = []
+                class_col = len(row)-1
+                classification = row[class_col]
+
+                # 'Iris-setosa' -> [1,0,0], 'Iris-virginica' -> [0,1,0], 'Iris-versicolor' -> [0,0,1]
+                classifications.append(
+                    classification_to_vector(classification))
+                for i in range(len(row)-1):
+                    data_point.append(row[i])
+
+                data_point_matrix.append(data_point)
+
+            #Append a 1 to every data point for the free param
+            data_point_matrix = np.asarray(data_point_matrix, dtype=np.float32)
+            ones = np.ones((data_point_matrix.shape[0], 1))
+            data_point_matrix = np.concatenate((data_point_matrix, ones), 1)
+
+            return data_point_matrix.T, np.asarray(classifications).T
     elif re.search("wine.data", inputFile):
         with open(inputFile) as csvfile:
             datareader = csv.reader(csvfile)
@@ -293,11 +320,13 @@ def classification_error(labels, predictions):
     error_labels = labels[error_indices]
 
     # Find the number of errors per class
-    error_labels_uniques = np.unique(error_labels, return_counts=True, axis = 0)
+    if error_labels.shape[0] != 0:
+        error_labels_uniques = np.unique(error_labels, return_counts=True, axis = 0)
 
-    # Build a dictionary of key = label and value = count of errors
-    N_errors_per_label = dict((str(key), value) for (key, value) in zip(error_labels_uniques[0], error_labels_uniques[1]))
-
+        # Build a dictionary of key = label and value = count of errors
+        N_errors_per_label = dict((str(key), value) for (key, value) in zip(error_labels_uniques[0], error_labels_uniques[1]))
+    else:
+        N_errors_per_label = {}
     return N_errors_per_label
 
 def perctange_based_training(data, labels, percentage):
@@ -314,7 +343,7 @@ def perctange_based_training(data, labels, percentage):
     labels = np.asarray(list(vector_to_classification(v) for v in testing_Y.T.tolist()))
     predictions = np.asarray(list(vector_to_classification(v) for v in tested_Y.T.tolist()))
 
-    print(classification_error(labels, predictions))    
+    print(classification_error(labels, predictions))
 
 if __name__ == '__main__':
     inputFile = sys.argv[1]
